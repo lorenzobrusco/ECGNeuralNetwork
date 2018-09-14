@@ -5,16 +5,16 @@
 $ git clone https://github.com/mtobeiyf/keras-flask-deploy-webapp.git
 ```
 
-### Install requirements
-
-```shell
-$ pip install -r requirements.txt
-```
-
 ### Download dataset
 
 ```shell
 wget --mirror --no-parent https://www.physionet.org/physiobank/database/mitdb/
+```
+
+### Install requirements
+
+```shell
+$ pip install -r requirements.txt
 ```
 
 Make sure you have the following installed:
