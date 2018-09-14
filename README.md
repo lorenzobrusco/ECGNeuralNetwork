@@ -38,6 +38,9 @@ Make sure you have the following installed:
 
 Python 2.7 or 3.5+ are supported and tested.
 
+### Create Images
+
+Run this script to create the dataset
 ```shell
-$ python app.py
+$ python convert_signal_img.py
 ```

@@ -29,7 +29,7 @@ def create_img_from_sign(size=(128, 128), augmentation=True):
     random.shuffle(files)
     train = files[: int(len(files) * _split_percentage)]
     test = files[int(len(files) * _split_percentage):]
-    print('TRAIN:\n',train,'\nTEST\n',test)
+    print('TRAIN:\n', train, '\nTEST\n', test)
     labels = json.loads(_labels_json)
 
     for file in files:
@@ -78,3 +78,6 @@ def create_img_from_sign(size=(128, 128), augmentation=True):
             plt.clf()
             plt.close('all')
         print('\n[INFO] FILE {} IS CONVERTED'.format((str(file))))
+
+
+csi.create_img_from_sign(size=_size, augmentation=False)
