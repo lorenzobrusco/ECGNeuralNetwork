@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.6 (ECGNeuralNetwork)" project-jdk-type="Python SDK" />
   <component name="PyCharmProfessionalAdvertiser">
     <option name="shown" value="true" />
@@ -7,4 +8,7 @@
   <component name="PythonCompatibilityInspectionAdvertiser">
     <option name="version" value="3" />
   </component>
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.6.2 (C:\ProgramData\Anaconda3\envs\tensorflow-gpu\python.exe)" project-jdk-type="Python SDK" />
+>>>>>>> c08ec3249434ad80a24808bed785e420f705c0aa
 </project>

@@ -10,4 +10,7 @@ opencv-python
 biosppy
 wfdb
 tqdm
+<<<<<<< HEAD
 -U scikit-image
+=======
+>>>>>>> c08ec3249434ad80a24808bed785e420f705c0aa
