@@ -10,5 +10,6 @@ opencv-python
 biosppy
 wfdb
 tqdm
+imutils
 
 

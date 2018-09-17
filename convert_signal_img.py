@@ -7,13 +7,65 @@ import wfdb
 import cv2
 import json
 import random
-import cropping as cr
 
 _range_to_ignore = 20
 _directory = 'mitbih/'
 _dataset_dir = 'dataset_no_augmentation/'
 _labels_json = '{ ".": "NOR", "N": "NOR", "V": "PVC", "/": "PAB", "L": "LBB", "R": "RBB", "A": "APC", "!": "VFW", "E": "VEB" }'
 _split_percentage = .70
+
+
+def cropping(image, filename, size):
+    """
+        :param image: the image to crop
+        :param filename:
+        :param size: prefered size
+        :return:
+    """
+    # Left Top Crop
+    crop = image[:96, :96]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '1' + '.png', crop)
+
+    # Center Top Crop
+    crop = image[:96, 16:112]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '2' + '.png', crop)
+
+    # Right Top Crop
+    crop = image[:96, 32:]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '3' + '.png', crop)
+
+    # Left Center Crop
+    crop = image[16:112, :96]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '4' + '.png', crop)
+
+    # Center Center Crop
+    crop = image[16:112, 16:112]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '5' + '.png', crop)
+
+    # Right Center Crop
+    crop = image[16:112, 32:]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '6' + '.png', crop)
+
+    # Left Bottom Crop
+    crop = image[32:, :96]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '7' + '.png', crop)
+
+    # Center Bottom Crop
+    crop = image[32:, 16:112]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '8' + '.png', crop)
+
+    # Right Bottom Crop
+    crop = image[32:, 32:]
+    crop = cv2.resize(crop, size)
+    cv2.imwrite(filename[:-5] + '9' + '.png', crop)
 
 
 def create_img_from_sign(size=(128, 128), augmentation=True):
@@ -73,11 +125,8 @@ def create_img_from_sign(size=(128, 128), augmentation=True):
             im_gray = cv2.resize(im_gray, size, interpolation=cv2.INTER_LANCZOS4)
             cv2.imwrite(filename, im_gray)
             if augmentation:
-                cr.cropping(im_gray, filename, size)
+                cropping(im_gray, filename, size)
             plt.cla()
             plt.clf()
             plt.close('all')
         print('\n[INFO] FILE {} IS CONVERTED'.format((str(file))))
-
-
-csi.create_img_from_sign(size=_size, augmentation=False)
