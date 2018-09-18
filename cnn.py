@@ -12,11 +12,7 @@ import cv2
 import json
 import imutils
 
-_train_dir = '../Data/dataset/train'
-_validation_dir = '../Data/dataset/validation'
-
-_train_dir_no_augmentation = '../Data/dataset_no_augmentation/train'
-_validation_dir_no_augmentation = '../Data/dataset_no_augmentation/validation'
+_dataset_dir = '../Data/dataset/'
 
 _labels_to_float = '{ "NOR": "0", "PVC" : "1", "PAB": "2", "LBB": "3", "RBB": "4", "APC": "5", "VFW": "6", "VEB": "7" }'
 _labels = json.loads(_labels_to_float)
@@ -26,12 +22,13 @@ _validation_files = 36413
 _rotate_range = 30
 _size = (64, 64)
 _batch_size = 32
-_epochs = 10
+_epochs = 30
 _n_classes = 8
 _regularizers_l1 = 0.0001
+_split_percentage = 0.70
 
 
-def create_model_old():
+def create_model():
     """
         Create model
         :param img_size:
@@ -45,74 +42,30 @@ def create_model_old():
                kernel_regularizer=regularizers.l1(_regularizers_l1)))
     model.add(keras.layers.ELU())
     model.add(BatchNormalization())
-    model.add(Conv2D(64, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(0.0001)))
+    model.add(Conv2D(64, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(_regularizers_l1)))
     model.add(keras.layers.ELU())
     model.add(BatchNormalization())
     model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-    model.add(Conv2D(128, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(0.0001)))
+    model.add(Conv2D(128, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(_regularizers_l1)))
     model.add(keras.layers.ELU())
     model.add(BatchNormalization())
-    model.add(Conv2D(128, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(0.0001)))
+    model.add(Conv2D(128, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(_regularizers_l1)))
     model.add(keras.layers.ELU())
     model.add(BatchNormalization())
     model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-    model.add(Conv2D(256, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(0.0001)))
+    model.add(Conv2D(256, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(_regularizers_l1)))
     model.add(keras.layers.ELU())
     model.add(BatchNormalization())
-    model.add(Conv2D(256, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(0.0001)))
+    model.add(Conv2D(256, (3, 3), strides=(1, 1), kernel_regularizer=regularizers.l1(_regularizers_l1)))
     model.add(keras.layers.ELU())
     model.add(BatchNormalization())
     model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
     model.add(Flatten())
-    model.add(Dense(2048, kernel_regularizer=regularizers.l1(0.0001)))
+    model.add(Dense(2048, kernel_regularizer=regularizers.l1(_regularizers_l1)))
     model.add(keras.layers.ELU())
     model.add(BatchNormalization())
     model.add(Dropout(0.5))
     model.add(Dense(8, activation='softmax'))
-
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-    return model
-
-
-def create_model():
-    """
-        Create model
-        :param img_size:
-        :return:
-    """
-
-    model = Sequential()
-
-    model.add(Conv2D(64, (3, 3), strides=(1, 1), input_shape=(_size[0], _size[1], 1), activation='relu',
-                     kernel_regularizer=regularizers.l1(_regularizers_l1)))
-    model.add(BatchNormalization())
-    model.add(
-        Conv2D(64, (3, 3), strides=(1, 1), activation='relu', kernel_regularizer=regularizers.l1(_regularizers_l1)))
-    model.add(BatchNormalization())
-    model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-
-    model.add(Conv2D(128, (3, 3), strides=(1, 1), activation='relu',
-                     kernel_regularizer=regularizers.l1(_regularizers_l1)))
-    model.add(BatchNormalization())
-    model.add(
-        Conv2D(128, (3, 3), strides=(1, 1), activation='relu', kernel_regularizer=regularizers.l1(_regularizers_l1)))
-    model.add(BatchNormalization())
-    model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-
-    model.add(Conv2D(256, (3, 3), strides=(1, 1), activation='relu',
-                     kernel_regularizer=regularizers.l1(_regularizers_l1)))
-    model.add(BatchNormalization())
-    model.add(
-        Conv2D(256, (3, 3), strides=(1, 1), activation='relu', kernel_regularizer=regularizers.l1(_regularizers_l1)))
-    model.add(BatchNormalization())
-    model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-
-    model.add(Flatten())
-    model.add(Dense(2048, activation='relu', kernel_regularizer=regularizers.l1(_regularizers_l1)))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Dense(units=8, activation='sigmoid'))
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -140,21 +93,65 @@ def encode_label(file):
     return label
 
 
-def load_files(directory, shuffle=True, all=True):
+def load_files(directory):
     """
         Load each name file in the directory
         :param directory:
         :param shuffle:
         :return:
     """
-    if all:
-        files = [f for f in listdir(directory)]
-    else:
-        files = [f for f in listdir(directory) if f[-5] == '0']
-    return files
+    train = []
+    validation = []
+
+    """ Load each image for each classes"""
+    NOR = [f for f in listdir(directory) if 'NOR' in f if f[-5] == '0']
+    PVC = [f for f in listdir(directory) if 'PVC' in f if f[-5] == '0']
+    PAB = [f for f in listdir(directory) if 'PAB' in f if f[-5] == '0']
+    LBB = [f for f in listdir(directory) if 'LBB' in f if f[-5] == '0']
+    RBB = [f for f in listdir(directory) if 'RBB' in f if f[-5] == '0']
+    APC = [f for f in listdir(directory) if 'APC' in f if f[-5] == '0']
+    VFW = [f for f in listdir(directory) if 'VFW' in f if f[-5] == '0']
+    VEB = [f for f in listdir(directory) if 'VEB' in f if f[-5] == '0']
+
+    random.shuffle(NOR)
+    random.shuffle(PVC)
+    random.shuffle(PAB)
+    random.shuffle(LBB)
+    random.shuffle(RBB)
+    random.shuffle(APC)
+    random.shuffle(VFW)
+    random.shuffle(VEB)
+
+    train += NOR[: int(len(NOR) * _split_percentage)]
+    validation += NOR[int(len(NOR) * _split_percentage):]
+
+    train += PVC[: int(len(PVC) * _split_percentage)]
+    validation += PVC[int(len(PVC) * _split_percentage):]
+
+    train += PAB[: int(len(PAB) * _split_percentage)]
+    validation += PAB[int(len(PAB) * _split_percentage):]
+
+    train += LBB[: int(len(LBB) * _split_percentage)]
+    validation += LBB[int(len(LBB) * _split_percentage):]
+
+    train += RBB[: int(len(RBB) * _split_percentage)]
+    validation += RBB[int(len(RBB) * _split_percentage):]
+
+    train += APC[: int(len(APC) * _split_percentage)]
+    validation += APC[int(len(APC) * _split_percentage):]
+
+    train += VFW[: int(len(VFW) * _split_percentage)]
+    validation += VFW[int(len(VFW) * _split_percentage):]
+
+    train += VEB[: int(len(VEB) * _split_percentage)]
+    validation += VEB[int(len(VEB) * _split_percentage):]
+
+    random.shuffle(train)
+    random.shuffle(validation)
+    return train, validation
 
 
-def load_dataset(files, directory, batch_size, size, shuffle, random_crop, random_rotate, flip):
+def load_dataset(files, directory, batch_size, size, random_crop, random_rotate, flip):
     """
         Load dataset in minibatch
         :param directory:
@@ -167,8 +164,6 @@ def load_dataset(files, directory, batch_size, size, shuffle, random_crop, rando
 
     # this line is just to make the generator infinite, keras needs that
     while True:
-        if shuffle:
-            random.shuffle(files)
         batch_start = 0
         batch_end = batch_size
         while batch_start < L:
@@ -228,74 +223,33 @@ def steps(files, batch_size):
     return len(files) / batch_size
 
 
-def training(model, shuffle=False, augmentation=True):
+def training(model, augmentation=True):
     """
         Training and testing the model
         :return:
     """
 
-    train = load_files(_train_dir, shuffle=shuffle, all=False)
-    validation = load_files(_validation_dir, shuffle=shuffle, all=False)
+    train, validation = load_files(_dataset_dir)
 
     chk = ModelCheckpoint("model.h5", monitor='val_loss', save_best_only=False)
+
     tsb = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=32, write_graph=True,
                                       write_grads=False,
                                       write_images=False, embeddings_freq=0, embeddings_layer_names=None,
                                       embeddings_metadata=None, embeddings_data=None)
-    eas = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='auto',
-                                        baseline=None)
-    callbacks_list = [chk, tsb, eas]
+
+    callbacks_list = [chk, tsb]
 
     model.fit_generator(
-        load_dataset(train, _train_dir, _batch_size, _size,
-                     shuffle=augmentation,
+        load_dataset(train, _dataset_dir, _batch_size, _size,
                      random_crop=augmentation,
                      random_rotate=augmentation,
                      flip=augmentation),
         steps_per_epoch=steps(train, _batch_size),
         epochs=_epochs,
-        validation_data=load_dataset(validation, _validation_dir, _batch_size, _size,
-                                     shuffle=augmentation,
+        validation_data=load_dataset(validation, _dataset_dir, _batch_size, _size,
                                      random_crop=augmentation,
                                      random_rotate=augmentation,
                                      flip=augmentation),
         validation_steps=steps(validation, _batch_size),
         callbacks=callbacks_list)
-
-    # model.save('model.h5')
-
-
-def training_old(model, shuffle=False):
-    """
-        Training and testing the model
-        :return:
-    """
-
-    train_datagen = ImageDataGenerator(rescale=1. / 255)
-
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
-
-    train_set = train_datagen.flow_from_directory(
-        _train_dir_no_augmentation,
-        target_size=_size,
-        color_mode='grayscale',
-        batch_size=_batch_size,
-        shuffle=shuffle,
-        class_mode='categorical')
-
-    test_set = test_datagen.flow_from_directory(
-        _validation_dir_no_augmentation,
-        target_size=_size,
-        color_mode='grayscale',
-        batch_size=_batch_size,
-        shuffle=shuffle,
-        class_mode='categorical')
-
-    model.fit_generator(
-        train_set,
-        steps_per_epoch=_train_files / _batch_size,
-        epochs=25,
-        validation_data=test_set,
-        validation_steps=_validation_files / _batch_size)
-
-    model.save('model_no_augmentation.h5')
