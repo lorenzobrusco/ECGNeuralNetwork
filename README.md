@@ -9,9 +9,16 @@ Convolutional neural networks required images as input, therefore, I transformed
 MIT-BIH provides an additional file containing information about Q-wave peak.
 
 Thus we create image for each Q-wave using thi formula:
-$$
-T(Qpeak(n - 1) + 20) \leq T(n) \leq T(Qpeak(n + 1) - 20)
-$$
+
+
+
+<div style="text-align:center">
+    <img src ="Images/formula.png"/>
+</div>
+
+
+
+
 
 <div style="text-align:center">
     <img src ="Images/signal_to_img.png"/>
@@ -75,6 +82,8 @@ $ git clone https://github.com/lorenzobrusco/ECGNeuralNetwork.git
 ```shell
 wget --mirror --no-parent https://www.physionet.org/physiobank/database/mitdb/
 ```
+
+
 
 ### Install requirements
 
