@@ -13,7 +13,7 @@ Thus we create image for each Q-wave using thi formula:
 
 
 <div style="text-align:center">
-    <img src ="../ImagesReadMe/formula.png"/>
+    <img src ="media/formula.png"/>
 </div>
 
 
@@ -21,7 +21,7 @@ Thus we create image for each Q-wave using thi formula:
 
 
 <div style="text-align:center">
-    <img src ="../ImagesReadMe/signal_to_img.png"/>
+    <img src ="media/signal_to_img.png"/>
 </div>
 
 
@@ -31,7 +31,7 @@ As a result, we obtained 100,000 images from the MIT-BIH arrhythmia
 database where each image is one of eight ECG beat types.
 
 <div style="text-align:center">
-    <img src ="../ImagesReadMe/beats.png"/>
+    <img src ="media/beats.png"/>
 </div>
 
 
@@ -50,14 +50,14 @@ Transformation:
 
 
 <div style="text-align:center">
-    <img src ="../ImagesReadMe/augmentation.png"/>
+    <img src ="media/augmentation.png"/>
 </div>
 
 
 ### Convolutional Neural Networks Struction
 
 <div style="text-align:center">
-    <img src ="../ImagesReadMe/layers.png"/>
+    <img src ="media/layers.png"/>
 </div>
 
 
