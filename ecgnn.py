@@ -1,6 +1,4 @@
-from keras.models import load_model
 import cnn
-
 
 """
     In order to see the the information about 
@@ -8,5 +6,6 @@ import cnn
     tensorboard --logdir=logs
 """
 
-model = cnn.create_model()
-cnn.training(model, augmentation=True)
+cnn.training(augmentation=True)
+cnn.predict_model()
+
