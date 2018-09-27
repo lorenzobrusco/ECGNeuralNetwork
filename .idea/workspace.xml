@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e883ed41-b56f-4dd0-8a36-e3a8f3bf3b1f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Images/formula.png" beforeDir="false" afterPath="$PROJECT_DIR$/Images/formula.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Images/signal_to_img.png" beforeDir="false" afterPath="$PROJECT_DIR$/Images/signal_to_img.png" afterDir="false" />
-    </list>
+    <list default="true" id="e883ed41-b56f-4dd0-8a36-e3a8f3bf3b1f" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,7 +12,7 @@
     <session id="-1859996419">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="13" />
+          <entry key="project.closed" value="14" />
           <entry key="project.open.time.16" value="1" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.4" value="2" />
