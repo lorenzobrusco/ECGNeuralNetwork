@@ -1,5 +1,5 @@
 ## ECG-Arrhythmia-classification
-During this work I was inspired from this paper "" in which they classify ECG into seven categories, one being normal and the other six being different types of arrhythmia using convolutional neural network.
+During this work I was inspired from this paper https://arxiv.org/pdf/1804.06812.pdf in which they classify ECG into seven categories, one being normal and the other six being different types of arrhythmia using convolutional neural network.
 Using a convolutional neural networks with 11 layers I've reached an accuracy equal to 94.01%, this result has been achieved adding some data augmentation.
 
 ### Convert Signal to Image
