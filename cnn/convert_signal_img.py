@@ -1,6 +1,7 @@
 from os.path import isfile, join
 from os import listdir
 import matplotlib.pyplot as plt
+from utilities import labels as lb
 import os
 import tqdm
 import wfdb
@@ -11,7 +12,6 @@ import random
 _range_to_ignore = 20
 _directory = 'mitbih/'
 _dataset_dir = 'dataset_no_augmentation/'
-_labels_json = '{ ".": "NOR", "N": "NOR", "V": "PVC", "/": "PAB", "L": "LBB", "R": "RBB", "A": "APC", "!": "VFW", "E": "VEB" }'
 _split_percentage = .70
 
 
@@ -82,7 +82,6 @@ def create_img_from_sign(size=(128, 128), augmentation=True):
     train = files[: int(len(files) * _split_percentage)]
     test = files[int(len(files) * _split_percentage):]
     print('TRAIN:\n', train, '\nTEST\n', test)
-    labels = json.loads(_labels_json)
 
     for file in files:
         print('[INFO] START TO CONVERT FILE {}'.format((str(file))))
@@ -90,9 +89,9 @@ def create_img_from_sign(size=(128, 128), augmentation=True):
         ann = wfdb.rdann(_directory + file, extension='atr')
         for i in tqdm.tqdm(range(1, len(ann.sample) - 1)):
 
-            if ann.symbol[i] not in labels:
+            if ann.symbol[i] not in lb.original_labels:
                 continue
-            label = labels[ann.symbol[i]]
+            label = lb.original_labels[ann.symbol[i]]
             if file in train:
                 dir = '{}train/{}'.format(_dataset_dir, label)
             else:

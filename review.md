@@ -108,6 +108,18 @@ In the graphs below we see that the network, probably, could continue to improve
 
 
 
+### Comparison with other paper
+
+| Author       | Acc(%)  |
+| ------------ | ------- |
+| **Proposed** | **94**  |
+| OMsignal     | 92 - 95 |
+| Xiong1       | 82      |
+| Pyakillya    | 86      |
+| İnanGüler    | 96.94   |
+
+
+
 ### Conclusion 
 
 So far the best result achieved is **acc: 94,01%** and **loss = 0.38**

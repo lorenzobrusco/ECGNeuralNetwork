@@ -1,11 +1,11 @@
-import cnn
 
-"""
+'''
+    Use this script such as main
+
     In order to see the the information about 
     the neural network performe this command:
     tensorboard --logdir=logs
-"""
+'''
 
-cnn.training(augmentation=True)
-cnn.predict_model()
-
+if __name__ == '__main__':
+    pass
