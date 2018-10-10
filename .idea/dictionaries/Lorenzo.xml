@@ -2,6 +2,7 @@
   <dictionary name="Lorenzo">
     <words>
       <w>dataset</w>
+      <w>minibatch</w>
       <w>regularizers</w>
     </words>
   </dictionary>

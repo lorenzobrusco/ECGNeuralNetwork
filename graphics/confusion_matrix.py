@@ -4,7 +4,6 @@ from sklearn.metrics import confusion_matrix
 
 class ConfusionMatrix():
     def __init__(self, y_true, y_pred, labels):
-        print(len(y_pred))
         cm = confusion_matrix(y_true, y_pred)
         self.print_cm(cm, labels)
 
@@ -14,7 +13,6 @@ class ConfusionMatrix():
         columnwidth = max([len(x) for x in labels] + [10])  # 5 is value length
         empty_cell = " " * columnwidth
         # Print header
-        print()
         print("    " + empty_cell, end='')
         for label in labels:
             print("%{0}s".format(columnwidth) % label, end='')

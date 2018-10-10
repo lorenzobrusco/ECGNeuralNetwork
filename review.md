@@ -1,6 +1,17 @@
 ## ECG-Arrhythmia-classification
 During this work I was inspired from this paper https://arxiv.org/pdf/1804.06812.pdf in which they classify ECG into seven categories, one being normal and the other six being different types of arrhythmia using convolutional neural network.
-Using a convolutional neural networks with 11 layers I've reached an accuracy equal to 94.01%, this result has been achieved adding some data augmentation.
+Using a **Ensemble learnig**  techinque, which combines the result of several classifiers to get one only.
+
+in this case two classifiers were used:
+
+- Convolutional neural networks with 11 hidden layers and an accuracy equal to 95.93%
+- Artificial neural networks with just 1 hidden layers and an accuracy equal to 96.89%
+
+The final result, obtained applied the average between the two results, is an accuracy equal to 97.86%
+
+
+
+## Convolutional Neural Network
 
 ### Convert Signal to Image
 
@@ -54,6 +65,21 @@ Transformation:
 </div>
 
 
+### Remove Noise
+
+In orderd to remove noise from each imges it used **Piecewise Aggregate Approximation** algorithm, which simply means that in order to reduce the dimensionality from *n* to *M*, we first divide the original time-series into *M* equally sized frames and secondly compute the mean values for each frame. The sequence assembled from the mean values is the PAA approximation (i.e., transform) of the original time-series.
+
+
+
+<div style="text-align:center">
+    <img src ="media/remove_noise.jpg"/>
+</div>
+
+
+
+
+
+
 ### Convolutional Neural Networks Struction
 
 <div style="text-align:center">
@@ -61,9 +87,17 @@ Transformation:
 </div>
 
 
-## Model
+## Artificial Neural Network
 
-Here is the link to the model: https://drive.google.com/open?id=12Hk4F6VDEeCahq7IMeS8j2Sbhf1Hsq9k
+
+
+<div style="text-align:center">
+    <img src ="media/ann.png"/>
+</div>
+
+## Models
+
+Here is the link to the models: https://drive.google.com/open?id=1NOO7zrl6BClrGPxItWrbPI8HK1Xza6zb
 
 
 
@@ -108,21 +142,23 @@ In the graphs below we see that the network, probably, could continue to improve
 
 
 
+
+
 ### Comparison with other paper
 
-| Author       | Acc(%)  |
-| ------------ | ------- |
-| **Proposed** | **94**  |
-| OMsignal     | 92 - 95 |
-| Xiong1       | 82      |
-| Pyakillya    | 86      |
-| İnanGüler    | 96.94   |
+| Author       | Acc(%)    |
+| ------------ | --------- |
+| **Proposed** | **97.86** |
+| OMsignal     | 92 - 95   |
+| Xiong1       | 82        |
+| Pyakillya    | 86        |
+| İnanGüler    | 96.94     |
 
 
 
 ### Conclusion 
 
-So far the best result achieved is **acc: 94,01%** and **loss = 0.38**
+So far the best result achieved is **acc: 97.86%**
 
 
 

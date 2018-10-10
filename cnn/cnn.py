@@ -1,8 +1,9 @@
 from keras.callbacks import ModelCheckpoint
+from keras.engine.saving import load_model
 from keras.layers import Conv2D, BatchNormalization, Flatten, Dense, Dropout, MaxPooling2D
 from graphics.train_val_tensorboard import TrainValTensorBoard
 from keras import Sequential
-from os import listdir
+from dataset import dataset
 from utilities import labels as lbs
 from random import randint
 from keras import regularizers
@@ -13,19 +14,18 @@ import cv2
 import imutils
 
 _dataset_dir = '../Data/dataset_filtered/'
-_model = 'models/cnn_model.h5'
+_model = '../Models/cnn.h5'
 
 _train_files = 71207
 _validation_files = 36413
 _rotate_range = 180
 _size = (64, 64)
 _batch_size = 32
-_filters= (4, 4)
+_filters = (4, 4)
 _epochs = 30
 _n_classes = 8
 _regularizers = 0.0001
-_split_validation_percentage = 0.70
-_split_test_percentage = 0.50
+
 _probability_to_change = 0.30
 _seed = 7
 
@@ -33,7 +33,6 @@ _seed = 7
 def create_model():
     """
         Create model
-        :param img_size:
         :return:
 
     """
@@ -74,6 +73,15 @@ def create_model():
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
+    return model
+
+
+def load_cnn_model():
+    """
+        Load and return model
+        :return:
+    """
+    model = load_model(_model)
     return model
 
 
@@ -134,40 +142,6 @@ def steps(files, batch_size):
     return len(files) / batch_size
 
 
-def load_files(directory):
-    """
-        Load each name file in the directory
-        :param directory:
-        :param shuffle:
-        :return:
-    """
-    train = []
-    validation = []
-    test = []
-
-    classes = {'NOR', 'PVC', 'PAB', 'LBB', 'RBB', 'APC', 'VFW', 'VEB'}
-
-    classes_dict = dict()
-
-    for key in classes:
-        classes_dict[key] = [f for f in listdir(directory) if key in f if f[-5] == '0']
-        random.shuffle(classes_dict[key])
-
-    for _, item in classes_dict.items():
-        train += item[: int(len(item) * _split_validation_percentage)]
-        val = item[int(len(item) * _split_validation_percentage):]
-        validation += val[: int(len(val) * _split_test_percentage)]
-        test += val[int(len(val) * _split_test_percentage):]
-
-    random.shuffle(train)
-    random.shuffle(validation)
-    random.shuffle(test)
-    with open('dataset/name_files_test.txt', 'w') as f:
-        for item in test:
-            f.write("%s\n" % item)
-    return train, validation, test
-
-
 def load_dataset(files, directory, batch_size, size, random_crop, random_rotate, flip):
     """
         Load dataset in minibatch
@@ -192,14 +166,14 @@ def load_dataset(files, directory, batch_size, size, random_crop, random_rotate,
             batch_end += batch_size
 
 
-def training(augmentation=True):
+def training(train=None, validation=None, augmentation=True):
     """
-        Training and testing the model
+        Training the model
         :return:
     """
     model = create_model()
-    train, validation, test = load_files(_dataset_dir)
-    print(model.summary())
+    if train is None and validation is None:
+        train, validation, test = dataset.load_files(_dataset_dir)
     callbacks_list = [ModelCheckpoint(_model, monitor='val_loss', save_best_only=True),
                       TrainValTensorBoard(write_graph=False)]
 
@@ -212,41 +186,12 @@ def training(augmentation=True):
         validation_steps=steps(validation, _batch_size),
         callbacks=callbacks_list)
 
-    evaluate_model(test, model)
-    predict_model(test, model)
 
-
-def evaluate_model(test, model):
-    """
-        Evaluate model
-        :return:
-    """
-    x, y = image_to_array(test, _size, _dataset_dir, True, True, True)
-    score = model.evaluate(x, y, verbose=0)
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
-
-
-def predict_model(test, model, confusion_matrix=False):
+def predict_model(model=None, test=None):
     """
         Predict model
         :return:
     """
     x, y = image_to_array(test, _size, _dataset_dir, True, True, True)
-    y = model.predict_classes(np.reshape(x, (len(test), 64, 64, 1)))
-    y_true = []
-    y_pred = []
-    labels = set()
-    acc = 0
-    for i in range(len(test)):
-        y_pred += test[i][:3]
-        y_true += lbs.revert_labels[str(y[i])]
-        labels.add(lbs.revert_labels[str(y[i])])
-        labels.add(test[i][:3])
-        if y_true[i] == y_pred[i]:
-            acc += 1
-    acc /= len(test)
-    print('Accuracy: %s' % acc)
-    if confusion_matrix:
-        labels = [lab for lab in labels]
-        cm.ConfusionMatrix(y_true, y_pred, labels)
+    y = model.predict(np.reshape(x, (len(test), _size[0], _size[1], 1)))
+    return y

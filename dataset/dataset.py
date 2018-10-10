@@ -12,7 +12,10 @@ import numpy as np
 _range_to_ignore = 20
 _directory = '../Data/mitbih/'
 _dataset_dir = '../Data/dataset_filtered/'
+_dataset_ann_dir = '../Data/dataset_ann/'
 _split_percentage = .70
+_split_validation_percentage = 0.70
+_split_test_percentage = 0.50
 _width = 2503
 _height = 3361
 
@@ -84,10 +87,8 @@ def create_img_from_sign(size=(128, 128), augmentation=True):
     random.shuffle(files)
     train = files[: int(len(files) * _split_percentage)]
     test = files[int(len(files) * _split_percentage):]
-    print('TRAIN:\n', train, '\nTEST\n', test)
 
     for file in files:
-        print('[INFO] START TO CONVERT FILE {}'.format((str(file))))
         sig, _ = wfdb.rdsamp(_directory + file)
         ann = wfdb.rdann(_directory + file, extension='atr')
         for i in tqdm.tqdm(range(1, len(ann.sample) - 1)):
@@ -131,7 +132,6 @@ def create_img_from_sign(size=(128, 128), augmentation=True):
             plt.cla()
             plt.clf()
             plt.close('all')
-        print('\n[INFO] FILE {} IS CONVERTED'.format((str(file))))
 
 
 def create_img_from_sign_filtered(size=(128, 128), size_paa=100, augmentation=True):
@@ -178,6 +178,40 @@ def create_img_from_sign_filtered(size=(128, 128), size_paa=100, augmentation=Tr
             plt.close('all')
 
 
+def create_json_from_sign_filtered(size_paa=100):
+    """
+        For each beat for each patient creates img apply some filters
+        :param size_paa: the new vector size
+    """
+    if not os.path.exists(_directory):
+        os.makedirs(_directory)
+
+    files = [f[:-4] for f in listdir(_directory) if isfile(join(_directory, f)) if (f.find('.dat') != -1)]
+
+    for f in tqdm.tqdm(range(len(files))):
+        file = files[f]
+        sig, _ = wfdb.rdsamp(_directory + file)
+        ann = wfdb.rdann(_directory + file, extension='atr')
+        for i in range(1, len(ann.sample) - 1):
+
+            if ann.symbol[i] not in lb.original_labels:
+                continue
+            label = lb.original_labels[ann.symbol[i]]
+
+            ''' Get the Q-peak intervall '''
+            start = ann.sample[i - 1] + _range_to_ignore
+            end = ann.sample[i + 1] - _range_to_ignore
+
+            signal = [sig[i][0] for i in range(start, end)]
+            paa = piecewise_aggregate_approximation(signal, size_paa)
+            filename = '{}{}_{}{}{}.txt'.format(_dataset_ann_dir, label, file[-3:], start, end)
+            with open(filename, 'w+') as f:
+                for i, item in enumerate(paa):
+                    f.write("%s" % item)
+                    if i < len(paa) - 1:
+                        f.write(", ")
+
+
 def piecewise_aggregate_approximation(vector, paa_dim: int):
     '''
         Transform signals in a vector of size M
@@ -198,3 +232,33 @@ def piecewise_aggregate_approximation(vector, paa_dim: int):
         res = [Y[indices].sum() / Y.shape[0] for indices in
                np.split(input_index, nUniques.cumsum())[:-1]]
     return res
+
+
+def load_files(directory):
+    """
+        Load each name file in the directory
+        :param directory:
+        :return:
+    """
+    train = []
+    validation = []
+    test = []
+
+    classes = {'NOR', 'PVC', 'PAB', 'LBB', 'RBB', 'APC', 'VFW', 'VEB'}
+
+    classes_dict = dict()
+
+    for key in classes:
+        classes_dict[key] = [f for f in listdir(directory) if key in f if f[-5] == '0']
+        random.shuffle(classes_dict[key])
+
+    for _, item in classes_dict.items():
+        train += item[: int(len(item) * _split_validation_percentage)]
+        val = item[int(len(item) * _split_validation_percentage):]
+        validation += val[: int(len(val) * _split_test_percentage)]
+        test += val[int(len(val) * _split_test_percentage):]
+
+    random.shuffle(train)
+    random.shuffle(validation)
+    random.shuffle(test)
+    return train, validation, test
