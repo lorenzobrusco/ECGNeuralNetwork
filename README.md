@@ -1,6 +1,17 @@
 ## ECG-Arrhythmia-classification
 During this work I was inspired from this paper https://arxiv.org/pdf/1804.06812.pdf in which they classify ECG into seven categories, one being normal and the other six being different types of arrhythmia using convolutional neural network.
-Using a convolutional neural networks with 11 layers I've reached an accuracy equal to 94.01%, this result has been achieved adding some data augmentation.
+Using a **Ensemble learnig**  techinque, which combines the result of several classifiers to get one only.
+
+in this case two classifiers were used:
+
+- Convolutional neural networks with 11 hidden layers and an accuracy equal to 95.93%
+- Artificial neural networks with just 1 hidden layers and an accuracy equal to 96.89%
+
+The final result, obtained applied the weighted average, using f-measure, between the two results, is an accuracy equal to 97.86%
+
+
+
+## Convolutional Neural Network
 
 ### Convert Signal to Image
 
@@ -54,6 +65,21 @@ Transformation:
 </div>
 
 
+### Remove Noise
+
+In orderd to remove noise from each imges it used **Piecewise Aggregate Approximation** algorithm, which simply means that in order to reduce the dimensionality from *n* to *M*, we first divide the original time-series into *M* equally sized frames and secondly compute the mean values for each frame. The sequence assembled from the mean values is the PAA approximation (i.e., transform) of the original time-series.
+
+
+
+<div style="text-align:center">
+    <img src ="media/remove_noise.jpg"/>
+</div>
+
+
+
+
+
+
 ### Convolutional Neural Networks Struction
 
 <div style="text-align:center">
@@ -61,9 +87,20 @@ Transformation:
 </div>
 
 
-## Model
+## Artificial Neural Network
 
-Here is the link to the model: https://drive.google.com/open?id=12Hk4F6VDEeCahq7IMeS8j2Sbhf1Hsq9k
+
+
+<div style="text-align:center">
+    <img src ="media/ann.png"/>
+</div>
+Artificial neural network proposed is formed just by an hidden layer with one hundred  neurons.
+
+
+
+## Models
+
+Here is the link to the models: https://drive.google.com/open?id=1NOO7zrl6BClrGPxItWrbPI8HK1Xza6zb
 
 
 
@@ -83,34 +120,26 @@ Dataset has been divided i three parts:
 
 The network has been traindend for 100 epochs for 10 hours.
 
-### Training graphs
-
-In the graphs below we see that the network, probably, could continue to improve.
-
-<div style="text-align:center">
-    <img src ="media/result-train.png"/>
-</div>
-
 
 
 ### Confusion matrix (Test set)
 
-|         | VEB          | RBB          | NOR          | VFW      | APC       | PAB          | PVC           | LBB           |
-| ------- | ------------ | ------------ | ------------ | -------- | --------- | ------------ | ------------- | ------------- |
-| **VEB** | **1.196,00** | 7,00         | 0,00         | 1,00     | 0,00      | 2,00         | 33,00         | 10,00         |
-| **RBB** | 7,00         | **4.856,00** | 33,00        | 2,00     | 0,00      | 0,00         | 0,00          | 81,00         |
-| **NOR** | 0,00         | 42,00        | **1.148,00** | 0,00     | 0,00      | 0,00         | 0,00          | 0,00          |
-| **VFW** | 0,00         | 0,00         | 0,00         | **8,00** | 0,00      | 0,00         | 0,00          | 0,00          |
-| **APC** | 0,00         | 0,00         | 0,00         | 0,00     | **49,00** | 0,00         | 0,00          | 5,00          |
-| **PAB** | 2,00         | 0,00         | 0,00         | 0,00     | 0,00      | **1.043,00** | 45,00         | 0,00          |
-| **PVC** | 126,00       | 0,00         | 0,00         | 0,00     | 0,00      | 150,00       | **11.024,00** | 0,00          |
-| **LBB** | 55,00        | 343,00       | 0,00         | 5,00     | 15,00     | 0,00         | 0,00          | **11.024,00** |
+|         | VEB        | PAB          | RBB           | PVC          | NOR        | LBB          | APC       | VFW       |
+| ------- | ---------- | ------------ | ------------- | ------------ | ---------- | ------------ | --------- | --------- |
+| **VEB** | **302,00** | 1,00         | 12,00         | 0,00         | 5,00       | 2,00         | 0,00      | 1,00      |
+| **PAB** | 0,00       | **1.151,00** | 1,00          | 0,00         | 5,00       | 0,00         | 0,00      | 1,00      |
+| **RBB** | 77,00      | 56,00        | **11.188,00** | 7,00         | 62,00      | 38,00        | 3,00      | 7,00      |
+| **PVC** | 0,00       | 0,00         | 3,00          | **1.040,00** | 3,00       | 0,00         | 1,00      | 0,00      |
+| **NOR** | 1,00       | 3,00         | 44,00         | 6,00         | **990,00** | 0,00         | 0,00      | 5,00      |
+| **LBB** | 1,00       | 0,00         | 4,00          | 0,00         | 1,00       | **1.049,00** | 0,00      | 0,00      |
+| **APC** | 0,00       | 0,00         | 0,00          | 0,00         | 0,00       | 0,00         | **12,00** | 0,00      |
+| **VFW** | 1,00       | 0,00         | 1,00          | 1,00         | 4,00       | 0,00         | 0,00      | **57,00** |
 
-
+​     
 
 ### Conclusion 
 
-So far the best result achieved is **acc: 94,01%** and **loss = 0.38**
+So far the best result achieved is **acc: 97.86%**
 
 
 
